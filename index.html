@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Form System</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .container {
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      padding: 25px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      text-align: center;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #2575fc;
+      outline: none;
+      box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+    }
+
+    button {
+      width: 100%;
+      background: #2575fc;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #1e63d1;
+    }
+
+    .feedback-list {
+      margin-top: 30px;
+    }
+
+    .feedback-item {
+      background: #f8f9ff;
+      border-left: 5px solid #2575fc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .feedback-item h4 {
+      margin: 0 0 5px;
+      color: #333;
+    }
+
+    .feedback-item p {
+      margin: 5px 0;
+      color: #555;
+    }
+
+    .rating {
+      color: #f5a623;
+      font-weight: bold;
+    }
+
+    .no-feedback {
+      text-align: center;
+      color: #777;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Feedback Form</h2>
+
+    <form id="feedbackForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Enter your name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+
+      <label for="rating">Rating</label>
+      <select id="rating" required>
+        <option value="">Select rating</option>
+        <option value="⭐">⭐</option>
+        <option value="⭐⭐">⭐⭐</option>
+        <option value="⭐⭐⭐">⭐⭐⭐</option>
+        <option value="⭐⭐⭐⭐">⭐⭐⭐⭐</option>
+        <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐</option>
+      </select>
+
+      <label for="message">Your Feedback</label>
+      <textarea id="message" rows="4" placeholder="Write your feedback..." required></textarea>
+
+      <button type="submit">Submit Feedback</button>
+    </form>
+
+    <div class="feedback-list" id="feedbackList">
+      <h3>Submitted Feedback</h3>
+      <div id="feedbackContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('feedbackForm');
+    const feedbackContainer = document.getElementById('feedbackContainer');
+
+    // Load saved feedbacks from localStorage
+    document.addEventListener('DOMContentLoaded', loadFeedbacks);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const rating = document.getElementById('rating').value;
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !rating || !message) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      const feedback = { name, email, rating, message, date: new Date().toLocaleString() };
+      saveFeedback(feedback);
+      displayFeedback(feedback);
+      form.reset();
+    });
+
+    function saveFeedback(feedback) {
+      let feedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
+      feedbacks.push(feedback);
+      localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+    }
+
+    function loadFeedbacks() {
+      let feedbacks = JSON.parse(localStorage.getItem('feedbacks')) || [];
+      if (feedbacks.length === 0) {
+        feedbackContainer.innerHTML = '<p class="no-feedback">No feedback submitted yet.</p>';
+        return;
+      }
+      feedbackContainer.innerHTML = '';
+      feedbacks.forEach(displayFeedback);
+    }
+
+    function displayFeedback(feedback) {
+      const item = document.createElement('div');
+      item.classList.add('feedback-item');
+      item.innerHTML = `
+        <h4>${feedback.name} <span class="rating">${feedback.rating}</span></h4>
+        <p><strong>Email:</strong> ${feedback.email}</p>
+        <p>${feedback.message}</p>
+        <small>Submitted on: ${feedback.date}</small>
+      `;
+      feedbackContainer.prepend(item);
+    }
+  </script>
+</body>
+</html>
